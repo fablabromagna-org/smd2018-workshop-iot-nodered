@@ -46,17 +46,15 @@ Contiene il codice sorgente per arduino, per dimostrare come sia possibile contr
 Inoltre una elaborazione locale di un programma permette la gestione degli I/O dell'Arduino.
 In questo caso un anello di 16 NeoPixel viene comandato secondo diversi scenari e valori inviati da PC.
 
-###  node-red
-
-Contiene uno script per l'avvio di n-istanze Node-RED su un singolo PC.
-Inoltre lo script permette di configurare i nodi aggiuntivi nelle singole istanze.
-
-In questo caso le varie istanza sono realizzate attraverso una serie di contenitori **[docker](https://www.docker.com/)** e sono raggiungibi dalla porta 1891 in su.
-
 
 ### services
 
 Contiene una serie di script utili ad avviare servizi utilizzati durante il workshop
 
+* `start_workshop.sh` avvia tutti i servizi utilizzati nel workshop
 * `webcam_streamer.sh` avvia uno streming HTTP di una webcam connessa al PC. Utilizza il sw **mjpg-streamer** che quindi deve essere installato e configurato opportunamente
- 
+* `node-red-multi.sh` avvio di n-istanze Node-RED su un singolo PC. Inoltre lo script permette di configurare i nodi aggiuntivi nelle singole istanze.
+
+In questo caso le varie istanza sono realizzate attraverso una serie di contenitori **[docker](https://www.docker.com/)** e sono raggiungibi dalla porta 1891 in su.
+
+
