@@ -85,7 +85,7 @@ install_modules() {
 sync_instances()
 {
 
-  if [[ $NR_INSTANCES -le 2 ]];   then
+  if [ $NR_INSTANCES -le 2 ];   then
     echo "ERROR: Select at least 2 instances"
     exit
   fi
@@ -117,8 +117,6 @@ subcommand=$1
 shift
 
 while getopts ':i:' arg; do
-
-  echo 'option >>>> '$arg
 
   case $arg in
     i) # Specify p value.
