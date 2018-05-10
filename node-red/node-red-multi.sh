@@ -12,7 +12,7 @@
 #----------------------------------------------------
 
 
-usage() { echo "Usage: $0 start|stop|install_modules  [-i <nr_of_instances>] " 1>&2; exit 1; }
+usage() { echo "Usage: $0 start|stop|install_modules|sync  [-i <nr_of_instances>] " 1>&2; exit 1; }
 
 
 NODERED_IMAGE=nodered/node-red-docker
@@ -23,21 +23,21 @@ NR_PREFIX=nodered_ws
 # Start node-red
 #------------------------------------------
 start() {
-echo "creating $NR_INSTANCES instances"
-for i in `seq 1 $NR_INSTANCES`;
-do
-  echo 'Creating node-red instance #'$i
-  PORT=`expr 1890 + $i`
-  echo 'Port: '$PORT
-  
-  DATA_DIR=~/node-red-data/nodered_ws$i
-  echo 'DATA_DIR: '$DATA_DIR
+  echo "creating $NR_INSTANCES instances"
+  for i in `seq 1 $NR_INSTANCES`;
+  do
+    echo 'Creating node-red instance #'$i
+    PORT=`expr 1890 + $i`
+    echo 'Port: '$PORT
+    
+    DATA_DIR=~/node-red-data/nodered_ws$i
+    echo 'DATA_DIR: '$DATA_DIR
 
-  mkdir -p $DATA_DIR
-  chmod 777 $DATA_DIR
+    mkdir -p $DATA_DIR
+    chmod 777 $DATA_DIR
 
-  docker run --rm -d -p $PORT:1880 -v $DATA_DIR:/data --name $NR_PREFIX$i $NODERED_IMAGE
-done
+    docker run --rm -d -p $PORT:1880 -v $DATA_DIR:/data --name $NR_PREFIX$i $NODERED_IMAGE
+  done
 }
 
 
@@ -79,6 +79,35 @@ install_modules() {
   set +o xtrace
 }
 
+#----------------------------------------------
+# Sync node-red configuration from #1 to others
+#----------------------------------------------
+sync_instances()
+{
+
+  if [[ $NR_INSTANCES -le 2 ]];   then
+    echo "ERROR: Select at least 2 instances"
+    exit
+  fi
+
+  DATA_DIR_SRC=~/node-red-data/nodered_ws1
+  for i in `seq 2 $NR_INSTANCES`;
+  do
+    DATA_DIR=~/node-red-data/nodered_ws$i
+
+    echo 'Sync node-red instance #1 to #'$i' - '$DATA_DIR
+        
+    mkdir -p $DATA_DIR
+    rsync -avr -q --exclude=flows.json  $DATA_DIR_SRC/ $DATA_DIR 
+    
+    
+  done
+
+  echo "Sync completed !"
+
+}
+
+
 #------------------------------------------
 # Parse script arguments
 #------------------------------------------
@@ -110,9 +139,13 @@ case $subcommand in
   stop) # kill all node-red-instances
     stop 
     ;;
-  install_modules)  # install additional modules to node-red instance
+  install_modules)  # install additional modules to node-red instance #1
     install_modules
     ;;
+  sync)
+    sync_instances
+    ;;
+  
   *)    # option not allowed
     usage;;
 esac
